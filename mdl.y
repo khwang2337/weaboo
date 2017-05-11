@@ -783,9 +783,7 @@ int main(int argc, char **argv) {
 
   yyin = fopen(argv[1],"r");
   
-  printf("started parsing\n");
   yyparse();
-  printf("finished parsing\n");
   //COMMENT OUT PRINT_PCODE AND UNCOMMENT
   //MY_MAIN IN ORDER TO RUN YOUR CODE
   

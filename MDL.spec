@@ -54,9 +54,9 @@ sphere [constants] x y z r [coord_system]
 
 torus [constants] x y z r0 r1  [coord_system]
 
-box [constants] x0 y0 z0 w h d [coord_system]
+box [constants] x0 y0 z0 h w d [coord_system]
 			- x0 y0 z0 = one corner of the box
-			- w h d = width height and depth
+			- h w d = height width and depth
 
 line [constants] x0 y0 z0 [coord_system0] x1 y1 z1 [coord_system1]
 			- NOTE: each endpoint of the line can be drawn
