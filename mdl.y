@@ -788,6 +788,10 @@ int main(int argc, char **argv) {
   //MY_MAIN IN ORDER TO RUN YOUR CODE
   
   //print_pcode();
+  //first_pass();
+  //struct vary_node ** knobs = second_pass();
+  //int i;
+  //for (i = 0; i < num_frames; i++) 
   my_main();
 
   return 0;    

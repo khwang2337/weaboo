@@ -93,6 +93,9 @@ frames num_frames	- How many frames to generate all together.
 vary knob start_frame end_frame start_val end_val
 			- vary a knob from start_val to end_val over
 			  the course of start_frame to end_frame
+			  
+			  num_frames = end_frame - start_frame
+			  (endval - startval) / num_frames * (currframe - startframe) + startval 
 setknobs value		- set all the knobs to value
 
 

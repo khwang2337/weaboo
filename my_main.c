@@ -73,6 +73,37 @@ void first_pass() {
   //they must be extern variables
   extern int num_frames;
   extern char name[128]; 
+	
+	int i;
+	char vary_exist = 0, basename_exist = 0, frames_set = 0;
+	
+	for (i = 0; i < lastop; i++) {
+		switch (op[i].opcode) {
+			case BASENAME:
+				basename_exist = 1;
+				strcpy(name, op[i].op.basename.p->name);
+				break;
+			
+			case VARY:
+				vary_exist = 1;
+				break;
+			
+			case FRAMES:
+				frames_set = 1;
+				num_frames = op[i].op.frames.num_frames;
+				break;
+		}
+	}
+	
+	if (vary_exist && ! frames_set) {
+		printf("first_pass error: vary without set frames\n");
+		exit(0);
+	}
+	
+	if (frames_set && ! basename_exist) {
+		printf("first pass warning: frames set without basename\n    basename is by default set to \"bravely\"\n");
+		strcpy(name, "bravely");
+	}
 
   return;
 }
@@ -82,7 +113,7 @@ void first_pass() {
   Returns: An array of vary_node linked lists
 
   In order to set the knobs for animation, we need to keep
-  a seaprate value for each knob for each frame. We can do
+  a separate value for each knob for each frame. We can do
   this by using an array of linked lists. Each array index
   will correspond to a frame (eg. knobs[0] would be the first
   frame, knobs[2] would be the 3rd frame and so on).
@@ -99,6 +130,33 @@ void first_pass() {
   jdyrlandweaver
   ====================*/
 struct vary_node ** second_pass() {
+	
+	int i;
+	struct vary_node ** knobs;
+	
+	double curr_f, start_f, start_v, end_f, end_v, slope;
+	start_f = op[i].op.vary.start_frame;
+	start_v = op[i].op.vary.start_val;
+	end_f = op[i].op.vary.end_frame;
+	end_v = op[i].op.vary.end_val;
+	slope = (end_v - start_v) / (end_f - start_f);
+	
+	
+	for (i = 0; i < lastop) {
+		switch (op[i].opcode) {
+			case VARY:
+				for (curr_f = 0; curr_f < num_frames; curr_f++) {
+					struct vary_node * tmp;
+					strcpy(tmp->name, op[i].op.vary.p->name);
+					//if (curr_f >= op[i].op.vary.start_frame && curr_f <= op[i].op.vary.end_frame) tmp->value = ( (op[i].op.vary.end_val - op[i].op.vary.start_val) / (op[i].op.vary.end_frame - op[i].op.vary.start_frame) ) * (curr_f - op[i].op.vary.start_frame) + op[i].op.vary.start_val;
+					if (curr_f >= start_f && curr_f <= end_f) tmp->value = startv + slope * (curr_f - start_f);
+					else tmp->value = 0;
+					tmp->next = knobs[curr_f];
+					knobs[curr_f] = tmp;
+				}
+				break;
+		}
+	}
   return NULL;
 }
 
