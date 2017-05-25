@@ -34,6 +34,73 @@ void add_polygon( struct matrix *polygons,
   add_point(polygons, x2, y2, z2);
 }
 
+void scan_line( struct matrix *polygons, int point, screen s, color c) {
+  double tX, tY, mX, mY, bX, bY, dx0, dx1;
+  int i;
+  
+  if (polygons->m[1][point] >= polygons->m[1][point + 1]) {
+    if (polygons->m[1][point] >= polygons->m[1][point + 2]) {
+      tX = polygons->m[0][point];
+      tY = polygons->m[1][point];
+      
+      if (polygons->m[1][point + 1] >= polygons->m[1][point+2]) {
+        mX = polygons->m[0][point + 1];
+        mY = polygons->m[1][point + 1];
+        bX = polygons->m[0][point + 2];
+        bY = polygons->m[1][point + 2];
+      }
+      else {
+        mX = polygons->m[0][point + 2];
+        mY = polygons->m[1][point + 2];
+        bX = polygons->m[0][point + 1];
+        bY = polygons->m[1][point + 1];
+      }
+    }
+    else {
+      tX = polygons->m[0][point + 2];
+      tY = polygons->m[1][point + 2];
+      mX = polygons->m[0][point];
+      mY = polygons->m[1][point];
+      bX = polygons->m[0][point + 1];
+      bY = polygons->m[1][point + 1];
+    }
+  }
+  else if (polygons->m[1][point] >= polygons->m[1][point + 2]) {
+    tX = polygons->m[0][point + 1];
+    tY = polygons->m[1][point + 1];
+    
+    if (polygons->m[1][point] >= polygons->m[1][point + 2]) {
+      mX = polygons->m[0][point];
+      mY = polygons->m[1][point];
+      bX = polygons->m[0][point + 2];
+      bY = polygons->m[1][point + 2];
+    }
+    else {
+      mX = polygons->m[0][point + 2];
+      mY = polygons->m[1][point + 2];
+      bX = polygons->m[0][point];
+      bY = polygons->m[1][point];
+    }
+  }
+  else {
+    tX = polygons->m[0][point + 2];
+    tY = polygons->m[1][point + 2];
+    mX = polygons->m[0][point + 1];
+    mY = polygons->m[1][point + 1];
+    bX = polygons->m[0][point];
+    bY = polygons->m[1][point];
+  }
+  
+  dx0 = (tX - bX) / (tY - bY);
+  if (mY == bY) dx1 = 0;
+  else dx1 = (mX - bX) / (mY - bY);
+  for (i = 0; i < mY - bY; i++) draw_line(bX + (i * dx0), bY + i, bX + (i * dx1), bY + i, s, c);
+  
+  if (tY == mY) dx1 = 0;
+  else dx1 = (tX - mX) / (tY - mY);
+  for (i = 0; i < tY - mY; i++) draw_line(bX + ((i + mY - bY) * dx0), mY + i, mX + (i * dx1), mY + i, s, c); 
+}
+
 /*======== void draw_polygons() ==========
 Inputs:   struct matrix *polygons
           screen s
@@ -55,24 +122,32 @@ void draw_polygons( struct matrix *polygons, screen s, color c ) {
   for (point=0; point < polygons->lastcol-2; point+=3) {
 
     normal = calculate_normal(polygons, point);
+    
+    color d;
+    d.red = 255;
+    d.blue = 0;
+    d.green = 0;
 
     if ( normal[2] > 0 ) {
-    
+      //scan_line(polygons, point, s, d);
+      
       draw_line( polygons->m[0][point],
 		 polygons->m[1][point],
 		 polygons->m[0][point+1],
 		 polygons->m[1][point+1],
 		 s, c);
+		 
       draw_line( polygons->m[0][point+2],
 		 polygons->m[1][point+2],
 		 polygons->m[0][point+1],
 		 polygons->m[1][point+1],
 		 s, c);	       
+		 
       draw_line( polygons->m[0][point],
 		 polygons->m[1][point],
 		 polygons->m[0][point+2],
 		 polygons->m[1][point+2],
-		 s, c);
+		 s, c); 
        }
   }
 }
